@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coxartrosis radiológica</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: lightbox de rayos X a la izquierda (siempre oscuro), lectura del estadio a la derecha; debajo, secuencia, patrones, tablas y autoevaluación */
+:root{
+  --paper:#eef2f3; --surface:#ffffff; --ink:#0f1a20; --muted:#51626c; --line:#cfd9dd;
+  --accent:#0b6e8f; --accent-soft:#d7eaf1; --mark:#9a6512; --warn:#b4432f; --ok:#2f7d5b;
+  --film:#07090a; --film-ink:#c9d3d7; --film-mark:#f2c14e;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0c1317; --surface:#121b20; --ink:#e3eaed; --muted:#93a5ae; --line:#24343c;
+  --accent:#5bb7d6; --accent-soft:#16313c; --mark:#f2c14e; --warn:#ec7a62; --ok:#6cc59b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0c1317; --surface:#121b20; --ink:#e3eaed; --muted:#93a5ae; --line:#24343c;
+  --accent:#5bb7d6; --accent-soft:#16313c; --mark:#f2c14e; --warn:#ec7a62; --ok:#6cc59b; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;display:grid;gap:56px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.08}
+h1{font-size:clamp(2.1rem,5vw,3.5rem);font-variation-settings:"wdth" 72;font-weight:780;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3vw,2.1rem);font-variation-settings:"wdth" 78;font-weight:720}
+h3{font-size:1.15rem;font-variation-settings:"wdth" 90;font-weight:680}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lead{color:var(--muted);max-width:64ch;font-size:1.05rem}
+header{display:grid;gap:12px}
+.byline{font-size:.88rem;color:var(--muted)}
+.byline b{color:var(--ink);font-weight:600}
+section{display:grid;gap:20px}
+.sec-head{display:grid;gap:8px;max-width:70ch}
+.sec-head p{color:var(--muted)}
+
+/* ---------- Visor ---------- */
+.lab{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.lab{grid-template-columns:1fr}}
+.viewer{display:grid;gap:14px;min-width:0}
+.film{background:var(--film);border-radius:6px;overflow:hidden;position:relative;box-shadow:0 1px 0 var(--line),0 18px 40px -24px rgba(0,0,0,.6)}
+.film svg{display:block;width:100%;height:auto}
+.controls{display:grid;gap:10px}
+.slider-row{display:flex;gap:12px;align-items:center}
+.play{flex:none;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer;display:grid;place-items:center}
+.play:hover{background:var(--accent-soft)}
+.play:focus-visible,.chip:focus-visible,.tick:focus-visible,.ev button:focus-visible,.opt:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.track{flex:1;min-width:0;display:grid;gap:4px}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0;height:28px}
+.ticks{display:flex;justify-content:space-between}
+.tick{font-family:var(--f-mono);font-size:.72rem;background:none;border:0;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:3px;width:44px;text-align:center}
+.tick:first-child{text-align:left;width:auto}.tick:last-child{text-align:right;width:auto}
+.tick.on{color:var(--accent);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips-label{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);width:100%}
+.chip{font:500 .8rem var(--f-body);padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted)}
+.chip[aria-pressed=true]{border-color:var(--mark);background:color-mix(in srgb,var(--mark) 12%,var(--surface))}
+.chip[aria-pressed=true]::before{background:var(--mark);border-color:var(--mark)}
+.chip.ghost{background:none}
+
+/* ---------- Panel de estadio ---------- */
+.panel{display:grid;gap:18px;min-width:0}
+.stage-tag{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{font-family:var(--f-mono);font-size:.74rem;padding:3px 9px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.pill.alt{background:none;border:1px solid var(--line);color:var(--muted)}
+.stage-name{font-size:clamp(1.7rem,3.4vw,2.4rem);font-variation-settings:"wdth" 74;font-weight:760}
+.readout{display:grid;gap:0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:9.5em minmax(0,1fr) 8.5em;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+@media (max-width:460px){.row{grid-template-columns:7.5em minmax(0,1fr);}.row .val{grid-column:2}}
+.row .k{color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s}
+.bar.inv i{background:var(--ok)}
+.bar.inv.low i{background:var(--warn)}
+.val{font-family:var(--f-mono);font-size:.8rem;font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:460px){.val{text-align:left}}
+.blocks{display:grid;gap:14px}
+.block{display:grid;gap:4px}
+.block h4{margin:0;font:600 .74rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.block p{max-width:62ch}
+
+/* ---------- Secuencia ---------- */
+.seq{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;counter-reset:ev}
+.ev{display:grid;gap:8px;grid-template-rows:auto auto 1fr auto;padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--surface);counter-increment:ev;position:relative}
+.ev .n{font-family:var(--f-display);font-variation-settings:"wdth" 62;font-weight:800;font-size:2.2rem;line-height:1;color:var(--accent)}
+.ev .n::before{content:counter(ev,decimal-leading-zero)}
+.ev .when{position:absolute;top:16px;right:16px;font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.ev p{font-size:.9rem;color:var(--muted)}
+.ev button{justify-self:start;font:500 .82rem var(--f-body);color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.ev.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.note{font-size:.88rem;color:var(--muted);max-width:75ch}
+
+/* ---------- Patrones ---------- */
+.patterns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.patterns{grid-template-columns:1fr}}
+.pat{display:grid;gap:10px;align-content:start}
+.pat .film{border-radius:5px}
+.pat .freq{font-family:var(--f-mono);font-size:.78rem;color:var(--accent)}
+.pat p{font-size:.9rem;color:var(--muted)}
+
+/* ---------- Tablas ---------- */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:520px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+thead th{font:600 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--accent-soft) 45%,var(--surface))}
+tbody th{font-weight:600}
+tr:last-child td,tr:last-child th{border-bottom:0}
+td.g{font-family:var(--f-mono);white-space:nowrap;color:var(--accent)}
+.facts{display:grid;gap:12px}
+.fact{padding:14px 16px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 6px 6px 0;display:grid;gap:4px}
+.fact b{font-weight:600}
+.fact p{font-size:.92rem;color:var(--muted)}
+
+/* ---------- Quiz ---------- */
+.quiz{display:grid;gap:14px}
+.q{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--surface);display:grid;gap:10px}
+.q .qt{font-weight:600}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{font:400 .9rem var(--f-body);text-align:left;padding:9px 12px;border:1px solid var(--line);border-radius:5px;background:var(--paper);color:var(--ink);cursor:pointer}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.opt.wrong{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.opt[disabled]{cursor:default}
+.exp{font-size:.88rem;color:var(--muted)}
+.score{font-family:var(--f-mono);font-size:.85rem;color:var(--accent)}
+
+footer{border-top:1px solid var(--line);padding-top:18px;font-size:.84rem;color:var(--muted);display:grid;gap:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="eyebrow">Semiología radiológica · Cadera</span>
+  <h1>La artrosis de cadera, fase por fase, en la radiografía</h1>
+  <p class="lead">Mueva el estadio y observe cómo cambian el espacio articular, el hueso subcondral, los márgenes y la posición de la cabeza femoral. Active cada hallazgo para verlo señalado sobre la placa.</p>
+  <p class="byline"><b>Juan David Serna Zuluaga</b>, MD, MSc · Universidad de Manizales</p>
+</header>
+
+<section aria-labelledby="t-lab">
+  <h2 id="t-lab" hidden>Visor interactivo</h2>
+  <div class="lab">
+    <div class="viewer">
+      <div class="film">
+        <svg id="main" viewBox="0 0 400 420" role="img" aria-label="Radiografía esquemática AP de cadera derecha"></svg>
+      </div>
+      <div class="controls">
+        <div class="slider-row">
+          <button class="play" id="play" aria-label="Reproducir la secuencia">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path id="playIcon" d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>
+          </button>
+          <div class="track">
+            <label for="stage" class="chips-label">Estadio Kellgren-Lawrence</label>
+            <input type="range" id="stage" min="0" max="4" step="0.01" value="2">
+            <div class="ticks" id="ticks"></div>
+          </div>
+        </div>
+        <div class="chips" id="chips"><span class="chips-label">Señalar en la placa</span></div>
+      </div>
+    </div>
+
+    <div class="panel" aria-live="polite">
+      <div class="stage-tag"><span class="pill" id="pKL">KL 2</span><span class="pill alt" id="pT">Tönnis 1</span></div>
+      <h3 class="stage-name" id="sName">Artrosis leve</h3>
+      <div class="readout" id="readout"></div>
+      <div class="blocks">
+        <div class="block"><h4>Qué se ve</h4><p id="sSee"></p></div>
+        <div class="block"><h4>Qué pasa en el tejido</h4><p id="sTissue"></p></div>
+        <div class="block"><h4>Correlación clínica</h4><p id="sClin"></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-seq">
+  <div class="sec-head">
+    <span class="eyebrow">Orden habitual de aparición</span>
+    <h2 id="t-seq">Secuencia de eventos radiológicos</h2>
+    <p>Cada tarjeta lleva el visor al estadio en que el hallazgo se hace evidente y lo señala.</p>
+  </div>
+  <ol class="seq" id="seq"></ol>
+  <p class="note">El orden es orientativo. El estrechamiento focal y los osteofitos son los signos más tempranos y reproducibles; la esclerosis los acompaña desde fases leves. Los quistes y la deformidad de la cabeza indican enfermedad avanzada.</p>
+</section>
+
+<section aria-labelledby="t-pat">
+  <div class="sec-head">
+    <span class="eyebrow">Dirección del pinzamiento</span>
+    <h2 id="t-pat">Patrones de migración de la cabeza femoral</h2>
+    <p>La zona donde se pierde el espacio orienta la causa. Los tres esquemas muestran un estadio moderado (KL 3).</p>
+  </div>
+  <div class="patterns">
+    <div class="pat">
+      <div class="film"><svg id="pSL" viewBox="0 0 400 420" role="img" aria-label="Migración superolateral"></svg></div>
+      <h3>Superolateral</h3><span class="freq">El patrón más frecuente en la artrosis primaria</span>
+      <p>Pinzamiento en la zona de carga, bajo la ceja cotiloidea. Se asocia a displasia acetabular y a choque femoroacetabular tipo leva.</p>
+    </div>
+    <div class="pat">
+      <div class="film"><svg id="pM" viewBox="0 0 400 420" role="img" aria-label="Migración medial"></svg></div>
+      <h3>Medial</h3><span class="freq">Segundo en frecuencia, más común en mujeres</span>
+      <p>El espacio se pierde hacia el fondo acetabular y el espacio superior se conserva o se ensancha. Puede evolucionar a protrusión acetabular.</p>
+    </div>
+    <div class="pat">
+      <div class="film"><svg id="pA" viewBox="0 0 400 420" role="img" aria-label="Migración axial"></svg></div>
+      <h3>Axial o concéntrico</h3><span class="freq">Raro en artrosis</span>
+      <p>Estrechamiento uniforme con pocos osteofitos. Debe hacer pensar en artritis inflamatoria (artritis reumatoide, espondiloartritis) o en condrólisis.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-cls">
+  <div class="sec-head">
+    <span class="eyebrow">Gradación y medición</span>
+    <h2 id="t-cls">Clasificaciones y criterios útiles</h2>
+  </div>
+  <div class="two">
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Grado</th><th>Kellgren-Lawrence</th><th>Tönnis</th></tr></thead>
+        <tbody>
+          <tr><td class="g">0</td><td>Sin signos de artrosis.</td><td>Sin signos de artrosis.</td></tr>
+          <tr><td class="g">1</td><td>Estrechamiento dudoso; posible osteofito marginal.</td><td>Aumento de esclerosis, leve estrechamiento, esfericidad conservada o casi.</td></tr>
+          <tr><td class="g">2</td><td>Estrechamiento definido, osteofitos definidos, algo de esclerosis.</td><td>Quistes pequeños, estrechamiento moderado, pérdida moderada de esfericidad.</td></tr>
+          <tr><td class="g">3</td><td>Estrechamiento marcado, osteofitos, esclerosis, quistes, deformidad de cabeza y acetábulo.</td><td>Quistes grandes, estrechamiento grave u obliteración, deformidad grave de la cabeza.</td></tr>
+          <tr><td class="g">4</td><td>Pérdida grosera del espacio, esclerosis y quistes, deformidad marcada, osteofitos grandes.</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>Espacio articular mínimo (JSW)</b><p>Se mide en la zona de carga en AP de pelvis en bipedestación. Normal ≈ 3–5 mm. Un JSW mínimo ≤ 2,5 mm sugiere artrosis; ≤ 1,5 mm es el umbral de Croft para definirla en estudios epidemiológicos.</p></div>
+      <div class="fact"><b>Criterios ACR (Altman, 1991)</b><p>Dolor de cadera más al menos 2 de 3: VSG &lt; 20 mm/h, osteofitos femorales o acetabulares, estrechamiento del espacio (superior, axial o medial).</p></div>
+      <div class="fact"><b>Proyecciones</b><p>AP de pelvis en carga para gradar. El falso perfil de Lequesne muestra antes el pinzamiento anterosuperior o posteroinferior. Lauenstein o Dunn para la unión cabeza-cuello y la morfología en leva.</p></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-dif">
+  <div class="sec-head">
+    <span class="eyebrow">No todo pinzamiento es artrosis</span>
+    <h2 id="t-dif">Diagnóstico diferencial radiológico</h2>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th></th><th>Artrosis</th><th>Artritis reumatoide</th><th>Necrosis avascular</th><th>Artropatía por CPPD</th></tr></thead>
+      <tbody>
+        <tr><th>Espacio articular</th><td>Pérdida focal, superolateral o medial</td><td>Pérdida uniforme, axial</td><td>Conservado hasta fases tardías</td><td>Focal o difusa</td></tr>
+        <tr><th>Osteofitos</th><td>Prominentes</td><td>Ausentes o escasos</td><td>Tardíos, secundarios</td><td>Prominentes</td></tr>
+        <tr><th>Hueso</th><td>Esclerosis subcondral, quistes</td><td>Osteopenia periarticular, erosiones</td><td>Esclerosis en la cabeza, signo de la semiluna, colapso</td><td>Quistes grandes, condrocalcinosis</td></tr>
+        <tr><th>Migración</th><td>Superolateral o medial</td><td>Axial, protrusión acetabular</td><td>Cabeza colapsa antes de que se pierda el espacio</td><td>Variable</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="t-quiz">
+  <div class="sec-head">
+    <span class="eyebrow">Autoevaluación</span>
+    <h2 id="t-quiz">Ponga a prueba su lectura</h2>
+    <p class="score" id="score">0 de 6 respondidas</p>
+  </div>
+  <div class="quiz" id="quiz"></div>
+</section>
+
+<footer>
+  <span>Esquemas radiológicos construidos con fines docentes; no corresponden a un paciente real.</span>
+  <span>Juan David Serna Zuluaga, MD, MSc · Médico, Magíster en Educación y Transformación Digital</span>
+</footer>
+</div>
+
+<script>
+(function(){
+const NS="http://www.w3.org/2000/svg";
+const C0=[230,185], RH=68, RA0=80, PXMM=2.7;
+const rad=a=>a*Math.PI/180, dir=a=>[Math.cos(rad(a)),-Math.sin(rad(a))];
+const gauss=(t,c,w)=>{let d=((t-c)%360+540)%360-180;return Math.exp(-(d*d)/(w*w));};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const f1=n=>n.toFixed(1);
+
+const S={shift:[0,3,6.5,11.5,17],flat:[0,0,.5,1.5,4.5],osteo:[0,3,7,11,16],scler:[0,.25,.5,.75,1],cyst:[0,0,.35,.7,1],butt:[0,0,.2,.6,1]};
+function paramsAt(t){
+  const i=Math.min(3,Math.floor(t)), f=t-i, p={shiftAng:120,flatAng:120,uniform:0};
+  for(const k in S) p[k]=lerp(S[k][i],S[k][i+1],f);
+  return p;
+}
+
+/* ---------- Geometría ---------- */
+function smooth(pts){ // Catmull-Rom cerrado
+  const n=pts.length; let d=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6], c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=`C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d+"Z";
+}
+const poly=pts=>"M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L")+"Z";
+const at=(c,r,a)=>{const v=dir(a);return [c[0]+r*v[0],c[1]+r*v[1]];};
+function sector(c,rIn,rOut,a0,a1){
+  const o=[],i=[];
+  for(let a=a0;a<=a1+0.01;a+=3){o.push(at(c,rOut(a),a));i.unshift(at(c,rIn(a),a));}
+  return poly(o.concat(i));
+}
+
+function geom(p){
+  const v=dir(p.shiftAng), T=[p.shift*v[0],p.shift*v[1]], Ch=[C0[0]+T[0],C0[1]+T[1]];
+  const rh=a=>RH - p.flat*gauss(a,p.flatAng,38) + p.osteo*.5*gauss(a,180,10) + p.osteo*.7*gauss(a,-100,11);
+  const ra=a=>RA0 - p.uniform;
+  const gap=a=>{const d=dir(a);return ra(a)-(T[0]*d[0]+T[1]*d[1]+rh(a));};
+  let mn=1e9,ma=90; for(let a=-30;a<=158;a+=1){const g=gap(a); if(g<mn){mn=g;ma=a;}}
+  return {T,Ch,rh,ra,gap,minGap:mn,minAng:ma};
+}
+
+/* ---------- Render de la placa ---------- */
+const BONE='style="mix-blend-mode:screen"';
+function staticLayer(id){
+  return `<defs>
+    <filter id="${id}-soft"><feGaussianBlur stdDeviation=".6"/></filter>
+    <filter id="${id}-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>
+    <filter id="${id}-grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .6 0 0 0 0"/></filter>
+    <radialGradient id="${id}-vig" cx="50%" cy="45%" r="70%"><stop offset="55%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".7"/></radialGradient>
+    <radialGradient id="${id}-soft-t" cx="35%" cy="60%" r="60%"><stop offset="0%" stop-color="#fff" stop-opacity=".09"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <marker id="${id}-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#f2c14e"/></marker>
+  </defs>
+  <rect width="400" height="420" fill="#07090a"/>
+  <rect width="400" height="420" fill="url(#${id}-soft-t)"/>
+  <g class="dyn"></g>
+  <rect width="400" height="420" fill="url(#${id}-vig)" pointer-events="none"/>
+  <rect width="400" height="420" filter="url(#${id}-grain)" opacity=".07" pointer-events="none"/>
+  <g class="ann"></g>`;
+}
+
+function render(svg,p,opt){
+  const id=svg.id, g=geom(p), {T,Ch,rh,ra}=g, hl=opt.hl||new Set();
+  const tr=([x,y])=>[x+T[0],y+T[1]];
+
+  // Pelvis
+  const pel=[];
+  for(let a=-40;a<=162;a+=4) pel.push(at(C0,ra(a),a));
+  pel.push([130,140],[104,108],[78,64],[62,20],[56,-20],[420,-20],[420,440],[336,440],[312,380],[300,320],[294,272]);
+  const obt="M382,345a30,48 0 1,0 -60,0a30,48 0 1,0 60,0Z";
+  // Osteofito acetabular lateral
+  const o=p.osteo, rim=at(C0,RA0,162), b1=at(C0,RA0+9,146), d205=dir(205), d195=dir(195);
+  const tip=[rim[0]+o*d205[0],rim[1]+o*d205[1]];
+  const tipO=[b1[0]+o*.75*d195[0],b1[1]+o*.75*d195[1]];
+  const acetOst=o>.4?smooth([b1,tipO,tip,at(C0,RA0-1,158)]):"";
+
+  // Fémur
+  const fem=[];
+  for(let a=190;a>=-115;a-=3) fem.push(at(Ch,rh(a),a));
+  [[190,268],[172,290],[166,306],[180,316],[174,331],[152,340],[144,380],[142,440],[74,440],[76,370],[74,305],[66,262],[70,232],[86,213],[106,210],[124,222],[146,207]].forEach(q=>fem.push(tr(q)));
+  const canal="M"+[[96,318],[95,440]].map(tr).map(q=>q.join(",")).join("L")+"M"+[[124,330],[126,440]].map(tr).map(q=>q.join(",")).join("L");
+  const calcar=[[198,250],[188,268],[171,288],[165,304]].map(q=>tr([q[0]-3,q[1]-2]));
+
+  const s=p.scler, fa=p.flatAng;
+  let h=`<g filter="url(#${id}-soft)" style="isolation:isolate">
+    <path d="${smooth(pel)} ${obt}" fill-rule="evenodd" fill="rgba(196,206,210,.40)" stroke="rgba(236,242,244,.7)" stroke-width="1.8" ${BONE}/>
+    ${acetOst?`<path d="${acetOst}" fill="rgba(196,206,210,.45)" stroke="rgba(236,242,244,.7)" stroke-width="1.6" ${BONE}/>`:""}
+    <path d="M300,196C296,225 298,252 309,254C320,255 321,230 318,200" fill="none" stroke="rgba(240,244,246,.55)" stroke-width="2.2" ${BONE}/>
+    <path d="M298,190C330,170 360,150 420,128" fill="none" stroke="rgba(240,244,246,.28)" stroke-width="2" ${BONE}/>
+    <path d="${sector(C0,a=>ra(a)+1,a=>ra(a)+3.2,96,160)}" fill="rgba(255,255,255,.55)" ${BONE}/>
+    <path d="${smooth(fem)}" fill="rgba(205,212,216,.48)" stroke="rgba(238,243,245,.75)" stroke-width="2" ${BONE}/>
+    <path d="${canal}" fill="none" stroke="rgba(236,242,244,.35)" stroke-width="1.4" ${BONE}/>
+    ${s>.02?`<g filter="url(#${id}-glow)" ${BONE}>
+      <path d="${sector(C0,a=>ra(a)+1,a=>ra(a)+4+12*s,fa-38,fa+36)}" fill="rgba(255,255,255,${(.55*s).toFixed(2)})"/>
+      <path d="${sector(Ch,a=>rh(a)-(4+12*s),a=>rh(a)-1,fa-34,fa+32)}" fill="rgba(255,255,255,${(.5*s).toFixed(2)})"/></g>`:""}
+    ${p.butt>.02?`<path d="M${calcar.map(q=>q.map(n=>n.toFixed(1)).join(",")).join("L")}" fill="none" stroke="rgba(255,255,255,${(.25+.55*p.butt).toFixed(2)})" stroke-width="${(1.5+5*p.butt).toFixed(1)}" stroke-linecap="round" ${BONE}/>`:""}
+  </g>`;
+
+  // Quistes
+  const cy=[["a",-2,16,6,.3],["a",12,21,4.5,.55],["a",-16,23,5,.75],["h",2,-16,6.5,.45],["h",-12,-25,4,.7],["h",16,-22,5,.85]];
+  const cysts=[];
+  cy.forEach(([w,da,off,sz,s0])=>{
+    const k=Math.max(0,Math.min(1,(p.cyst-s0)/.3)); if(k<=0) return;
+    const a=fa+da, c=w==="a"?at(C0,ra(a)+off,a):at(Ch,rh(a)+off,a), r=sz*k;
+    cysts.push(c);
+    h+=`<ellipse cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" rx="${(r*1.15).toFixed(1)}" ry="${r.toFixed(1)}" fill="#0b0e10" fill-opacity=".85" stroke="rgba(235,240,242,.5)" stroke-width="1.1"/>`;
+  });
+
+  // HUD
+  const mm=Math.max(0,g.minGap)/PXMM;
+  if(opt.hud){
+    h+=`<g font-family="IBM Plex Mono,monospace" font-size="10" fill="rgba(220,228,232,.72)">
+      <rect x="12" y="12" width="18" height="18" fill="none" stroke="rgba(220,228,232,.6)"/><text x="21" y="25" text-anchor="middle" font-size="11">D</text>
+      <text x="388" y="24" text-anchor="end">AP PELVIS · BIPEDESTACIÓN</text>
+      <text x="12" y="406">JSW MÍN ${f1(mm)} mm</text>
+      <text x="388" y="406" text-anchor="end">${opt.hud}</text></g>`;
+  }
+  svg.querySelector(".dyn").innerHTML=h;
+
+  // Anotaciones
+  const M="#f2c14e", lbl=(x,y,t,anc)=>`<text x="${x}" y="${y}" fill="${M}" font-family="IBM Plex Mono,monospace" font-size="10.5" text-anchor="${anc||"start"}" paint-order="stroke" stroke="#07090a" stroke-width="3">${t}</text>`;
+  let a="";
+  if(hl.has("jsw")){
+    const ang=g.minAng, A=at(C0,ra(ang),ang), H=at(Ch,rh(ang),ang), out=dir(ang);
+    const L=[A[0]+out[0]*30,A[1]+out[1]*30];
+    a+=`<line x1="${H[0]}" y1="${H[1]}" x2="${A[0]}" y2="${A[1]}" stroke="${M}" stroke-width="2"/>
+      <circle cx="${H[0]}" cy="${H[1]}" r="2.2" fill="${M}"/><circle cx="${A[0]}" cy="${A[1]}" r="2.2" fill="${M}"/>
+      <line x1="${A[0]}" y1="${A[1]}" x2="${L[0]}" y2="${L[1]}" stroke="${M}" stroke-width="1" stroke-dasharray="2 2"/>`
+      + lbl(L[0]+(out[0]<0?-4:4),L[1]-4, g.minGap<=0.3?"contacto óseo":`${f1(mm)} mm`, out[0]<0?"end":"start");
+  }
+  if(hl.has("osteo")){
+    if(o>1.2){
+      const pts=[tip, at(Ch,rh(180),180), at(Ch,rh(-100),-100)];
+      pts.forEach(q=>a+=`<circle cx="${q[0]}" cy="${q[1]}" r="${(7+o*.45).toFixed(1)}" fill="none" stroke="${M}" stroke-width="1.6"/>`);
+      a+=lbl(tip[0]-12,tip[1]-14,"osteofitos","end");
+    } else a+=lbl(150,120,"sin osteofitos","end");
+  }
+  if(hl.has("scler")){
+    if(s>.05){
+      a+=`<path d="${sector(C0,x=>ra(x)+1,x=>ra(x)+4+12*s,fa-38,fa+36)}" fill="none" stroke="${M}" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <path d="${sector(Ch,x=>rh(x)-(4+12*s),x=>rh(x)-1,fa-34,fa+32)}" fill="none" stroke="${M}" stroke-width="1.2" stroke-dasharray="3 2"/>`;
+      const q=at(C0,ra(fa)+30+12*s,fa+8); a+=lbl(q[0],q[1]-6,"esclerosis subcondral","middle");
+    } else a+=lbl(230,70,"sin esclerosis","middle");
+  }
+  if(hl.has("cyst")){
+    if(cysts.length){ cysts.forEach(q=>a+=`<circle cx="${q[0]}" cy="${q[1]}" r="10" fill="none" stroke="${M}" stroke-width="1.4"/>`);
+      const q=cysts[cysts.length-1]; a+=lbl(q[0]+14,q[1]+16,"quistes");}
+    else a+=lbl(230,70,"sin quistes","middle");
+  }
+  if(hl.has("deform")){
+    a+=`<circle cx="${Ch[0]}" cy="${Ch[1]}" r="${RH}" fill="none" stroke="#7fd0ec" stroke-width="1.3" stroke-dasharray="4 3"/>`+
+       `<text x="${Ch[0]}" y="${Ch[1]+RH+16}" fill="#7fd0ec" font-family="IBM Plex Mono,monospace" font-size="10" text-anchor="middle" paint-order="stroke" stroke="#07090a" stroke-width="3">contorno esférico de referencia</text>`;
+  }
+  if(hl.has("migr")){
+    a+=`<circle cx="${C0[0]}" cy="${C0[1]}" r="3" fill="none" stroke="${M}" stroke-width="1.4"/><line x1="${C0[0]-7}" y1="${C0[1]}" x2="${C0[0]+7}" y2="${C0[1]}" stroke="${M}"/><line x1="${C0[0]}" y1="${C0[1]-7}" x2="${C0[0]}" y2="${C0[1]+7}" stroke="${M}"/>`;
+    if(p.shift>.6){
+      const E=[C0[0]+T[0]*3,C0[1]+T[1]*3];
+      a+=`<line x1="${C0[0]}" y1="${C0[1]}" x2="${E[0]}" y2="${E[1]}" stroke="${M}" stroke-width="2" marker-end="url(#${id}-arr)"/>`+(opt.mini?"":lbl(E[0]+(T[0]<0?-6:6),E[1]-6,"desplazamiento ×3",T[0]<0?"end":"start"));
+    } else a+=lbl(C0[0]+10,C0[1]-10,"centro sin desplazar");
+  }
+  if(hl.has("butt")){
+    const q=calcar[1];
+    a+=`<ellipse cx="${q[0]}" cy="${q[1]}" rx="18" ry="30" transform="rotate(35 ${q[0]} ${q[1]})" fill="none" stroke="${M}" stroke-width="1.5"/>`+
+       (p.butt>.05?lbl(q[0]+22,q[1]+30,"buttressing"):lbl(q[0]+22,q[1]+30,"cortical normal"));
+  }
+  svg.querySelector(".ann").innerHTML=a;
+  return {g,mm};
+}
+
+/* ---------- Datos de los estadios ---------- */
+const ST=[
+ {n:"Cadera normal",t:"0",see:"Espacio articular simétrico de unos 4 mm en la zona de carga, cabeza femoral esférica y congruente con el acetábulo, ceja cotiloidea fina y regular. Márgenes lisos, sin osteofitos.",
+  tis:"Cartílago hialino íntegro. El hueso subcondral recibe la carga de forma distribuida.",
+  cl:"Una radiografía normal no descarta artrosis temprana: el daño del cartílago precede en meses o años a los cambios visibles."},
+ {n:"Artrosis dudosa",t:"1",see:"Estrechamiento dudoso y focal en la zona superolateral. Posible labio osteofítico en el borde lateral del acetábulo o en la unión cabeza-cuello. Esclerosis leve de la ceja cotiloidea.",
+  tis:"Fibrilación y adelgazamiento focal del cartílago donde la carga es máxima. En la periferia comienza la osificación endocondral que formará los osteofitos.",
+  cl:"Dolor inguinal mecánico y rigidez matutina breve (menos de 30 min). La rotación interna dolorosa o limitada es el hallazgo exploratorio más precoz."},
+ {n:"Artrosis leve",t:"1–2",see:"Estrechamiento definido del espacio superolateral, osteofitos marginales claros en el acetábulo y en la cabeza, y esclerosis subcondral (eburnación) en techo acetabular y polo superior de la cabeza.",
+  tis:"Pérdida de espesor del cartílago con remodelación del hueso subcondral, que se engrosa para soportar la carga concentrada.",
+  cl:"Con dolor de cadera, la presencia de osteofitos o de estrechamiento ya cumple los criterios ACR. Inicia la limitación de la rotación interna y de la flexión."},
+ {n:"Artrosis moderada",t:"2",see:"Estrechamiento marcado, esclerosis evidente y quistes subcondrales en el techo acetabular (quistes de Eggers) y en la cabeza. La cabeza pierde esfericidad y migra; aparece engrosamiento cortical medial del cuello (buttressing).",
+  tis:"Áreas de hueso desnudo. La presión del líquido sinovial y las microfracturas subcondrales originan las geodas. El cuello responde a la carga anómala con aposición cortical medial.",
+  cl:"Claudicación, marcha antálgica, signo de Trendelenburg posible. Limitación de rotaciones, flexión y abducción."},
+ {n:"Artrosis grave",t:"3",see:"Obliteración del espacio articular con contacto hueso-hueso, quistes grandes, esclerosis intensa, osteofitos grandes y deformidad marcada de la cabeza (aplanamiento, aspecto en hongo) con migración superolateral franca.",
+  tis:"Ausencia de cartílago en la zona de carga, colapso y remodelación del hueso subcondral, osteofitos que modifican la congruencia articular.",
+  cl:"Contractura en flexión, aducción y rotación externa, acortamiento aparente del miembro. Candidata a artroplastia cuando el dolor y la función lo justifican."}
+];
+const FIND=[["jsw","Espacio articular"],["scler","Esclerosis"],["osteo","Osteofitos"],["cyst","Quistes"],["butt","Buttressing"],["deform","Deformidad de la cabeza"],["migr","Migración"]];
+const EV=[
+ {k:["jsw"],st:2,w:"KL 1–2",t:"Estrechamiento focal del espacio",d:"Empieza en la zona de carga superolateral (o anterosuperior en el falso perfil). Es asimétrico, a diferencia de las artritis inflamatorias."},
+ {k:["osteo"],st:2,w:"KL 1–2",t:"Osteofitos marginales",d:"En el borde lateral del acetábulo y alrededor de la unión cabeza-cuello, donde pueden formar un collar. Son el signo más específico."},
+ {k:["scler"],st:2,w:"KL 2",t:"Esclerosis subcondral",d:"Eburnación del techo acetabular y del polo superior de la cabeza: el hueso se densifica bajo la carga concentrada."},
+ {k:["cyst"],st:3,w:"KL 3",t:"Quistes subcondrales",d:"Geodas de borde esclerótico en el techo (quistes de Eggers) y en la cabeza femoral, siempre en la zona de máxima presión."},
+ {k:["butt"],st:3,w:"KL 3",t:"Engrosamiento cortical medial",d:"Buttressing: aposición de hueso en la cortical medial del cuello femoral como respuesta a la carga alterada."},
+ {k:["deform","migr"],st:4,w:"KL 3–4",t:"Deformidad y migración de la cabeza",d:"Aplanamiento del polo superior y desplazamiento superolateral; la cabeza deja de ser esférica y pierde congruencia."},
+ {k:["jsw"],st:4,w:"KL 4",t:"Obliteración del espacio",d:"Contacto hueso-hueso con esclerosis intensa y osteofitos grandes. Fase terminal."}
+];
+
+/* ---------- Estado e interfaz ---------- */
+const main=document.getElementById("main"), slider=document.getElementById("stage");
+[main,document.getElementById("pSL"),document.getElementById("pM"),document.getElementById("pA")].forEach(s=>s.innerHTML=staticLayer(s.id));
+let t=2, sel=new Set(["jsw"]), activeEv=-1;
+
+const ticks=document.getElementById("ticks");
+for(let i=0;i<5;i++){const b=document.createElement("button");b.className="tick";b.textContent="KL "+i;b.type="button";b.onclick=()=>{stop();goTo(i);};ticks.appendChild(b);}
+const chips=document.getElementById("chips");
+FIND.forEach(([k,l])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.k=k;b.textContent=l;
+  b.onclick=()=>{sel.has(k)?sel.delete(k):sel.add(k);activeEv=-1;update();};chips.appendChild(b);});
+const allB=document.createElement("button");allB.type="button";allB.className="chip ghost";allB.textContent="Todos";
+allB.onclick=()=>{sel=sel.size===FIND.length?new Set():new Set(FIND.map(f=>f[0]));activeEv=-1;update();};chips.appendChild(allB);
+
+const lvl=(v,arr)=>arr[Math.min(arr.length-1,Math.round(v*(arr.length-1)))];
+function readout(p,mm){
+  const nC=[.3,.55,.75,.45,.7,.85].filter(s0=>p.cyst>s0+.05).length;
+  const rows=[
+    ["Espacio articular",mm/4.4,mm<1.5?"inv low":"inv",`${f1(mm)} mm`],
+    ["Osteofitos",p.osteo/16,"",lvl(p.osteo/16,["Ausentes","Dudosos","Definidos","Moderados","Grandes"])],
+    ["Esclerosis",p.scler,"",lvl(p.scler,["Ausente","Leve","Moderada","Marcada","Intensa"])],
+    ["Quistes",p.cyst,"",nC?`${nC} visible${nC>1?"s":""}`:"Ausentes"],
+    ["Esfericidad",p.flat/4.5,"",lvl(p.flat/4.5,["Conservada","Leve pérdida","Pérdida moderada","Aplanada"])],
+    ["Migración",p.shift/17,"",`${f1(p.shift/PXMM)} mm sup-lat`]
+  ];
+  document.getElementById("readout").innerHTML=rows.map(r=>`<div class="row"><span class="k">${r[0]}</span><span class="bar ${r[2]}"><i style="width:${Math.max(0,Math.min(1,r[1]))*100}%"></i></span><span class="val">${r[3]}</span></div>`).join("");
+}
+let lastStage=-1;
+function update(){
+  const p=paramsAt(t), si=Math.round(t), d=ST[si];
+  const {mm}=render(main,p,{hl:sel,hud:`KL ${si} · TÖNNIS ${d.t}`});
+  slider.value=t; slider.setAttribute("aria-valuetext",`Kellgren-Lawrence ${si}, ${d.n}`);
+  readout(p,mm);
+  if(si!==lastStage){lastStage=si;
+    document.getElementById("pKL").textContent="KL "+si; document.getElementById("pT").textContent="Tönnis "+d.t;
+    document.getElementById("sName").textContent=d.n; document.getElementById("sSee").textContent=d.see;
+    document.getElementById("sTissue").textContent=d.tis; document.getElementById("sClin").textContent=d.cl;
+    [...ticks.children].forEach((b,i)=>b.classList.toggle("on",i===si));
+  }
+  chips.querySelectorAll(".chip[data-k]").forEach(b=>b.setAttribute("aria-pressed",sel.has(b.dataset.k)));
+  document.querySelectorAll(".ev").forEach((e,i)=>e.classList.toggle("active",i===activeEv));
+}
+
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let anim=null;
+function tween(to,dur,done){
+  cancelAnimationFrame(anim); const from=t, t0=performance.now();
+  if(reduce||dur<=0){t=to;update();done&&done();return;}
+  const step=now=>{const k=Math.min(1,(now-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; t=from+(to-from)*e; update();
+    if(k<1) anim=requestAnimationFrame(step); else done&&done();};
+  anim=requestAnimationFrame(step);
+}
+function goTo(i,done){tween(i,Math.abs(i-t)*650,done);}
+
+slider.addEventListener("input",()=>{stop();t=+slider.value;update();});
+slider.addEventListener("change",()=>goTo(Math.round(t)));
+
+let playing=false, timer=null;
+const icon=document.getElementById("playIcon"), playB=document.getElementById("play");
+function stop(){playing=false;clearTimeout(timer);cancelAnimationFrame(anim);icon.setAttribute("d","M4 2.5v11l9-5.5z");playB.setAttribute("aria-label","Reproducir la secuencia");}
+function next(){
+  if(!playing) return;
+  const n=Math.floor(t+1e-6)+1;
+  if(n>4){stop();return;}
+  tween(n,1300,()=>{timer=setTimeout(next,reduce?1600:900);});
+}
+playB.onclick=()=>{
+  if(playing){stop();return;}
+  playing=true; icon.setAttribute("d","M4 2.5h3v11H4zM9 2.5h3v11H9z"); playB.setAttribute("aria-label","Pausar la secuencia");
+  sel=new Set(FIND.map(f=>f[0]).filter(k=>k!=="deform")); activeEv=-1;
+  if(t>3.99){t=0;update();timer=setTimeout(next,700);} else next();
+};
+
+// Secuencia
+const seq=document.getElementById("seq");
+EV.forEach((e,i)=>{const li=document.createElement("li");li.className="ev";
+  li.innerHTML=`<span class="n" aria-hidden="true"></span><span class="when">${e.w}</span><h3>${e.t}</h3><p>${e.d}</p><button type="button">Ver en la radiografía</button>`;
+  li.querySelector("button").onclick=()=>{stop();sel=new Set(e.k);activeEv=i;goTo(e.st);
+    document.querySelector(".lab").scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});};
+  seq.appendChild(li);});
+
+// Patrones
+const base3=paramsAt(3);
+render(document.getElementById("pSL"),base3,{hl:new Set(["jsw","migr"]),mini:1});
+render(document.getElementById("pM"),Object.assign({},base3,{shiftAng:8,shift:10,flatAng:20,flat:1}),{hl:new Set(["jsw","migr"]),mini:1});
+render(document.getElementById("pA"),Object.assign({},base3,{shiftAng:90,shift:2,uniform:8.5,flat:0,osteo:2,scler:.3,cyst:0,butt:0}),{hl:new Set(["jsw","migr"]),mini:1});
+
+// Quiz
+const QZ=[
+ {q:"¿En qué zona suele iniciarse el estrechamiento en la coxartrosis primaria?",o:["Superolateral, zona de carga","Medial, fondo acetabular","Uniforme en toda la articulación","Inferior, cerca del agujero obturador"],c:0,e:"La carga se concentra bajo la ceja cotiloidea; por eso la migración superolateral es el patrón más frecuente."},
+ {q:"Estrechamiento concéntrico, osteopenia periarticular y ausencia de osteofitos sugieren:",o:["Artrosis primaria","Artritis inflamatoria","Necrosis avascular inicial","Displasia de cadera"],c:1,e:"El pinzamiento axial uniforme sin respuesta osteofítica es típico de la artritis reumatoide y otras artritis inflamatorias."},
+ {q:"Los quistes subcondrales del techo acetabular en la artrosis se denominan:",o:["Quistes de Baker","Quistes de Eggers","Signo de la semiluna","Quistes sinoviales"],c:1,e:"Son geodas de borde esclerótico en la zona de máxima presión; en la cabeza femoral también aparecen geodas."},
+ {q:"El engrosamiento de la cortical medial del cuello femoral en la artrosis avanzada se conoce como:",o:["Signo de la gota","Buttressing","Coxa profunda","Signo del cruce"],c:1,e:"Es aposición ósea reactiva a la carga anómala; aparece en fases moderadas a graves."},
+ {q:"¿Qué proyección muestra antes el pinzamiento anterosuperior?",o:["AP de pelvis en decúbito","Falso perfil de Lequesne","Axial de Löwenstein","Proyección de Judet obturatriz"],c:1,e:"El falso perfil detecta el estrechamiento anterior o posteroinferior que en la AP todavía no se ve."},
+ {q:"Paciente con dolor de cadera y espacio articular conservado, con línea radiolúcida subcondral en la cabeza. ¿Qué es más probable?",o:["Artrosis grado 2","Necrosis avascular","Artritis séptica","Condrocalcinosis"],c:1,e:"En la necrosis avascular la cabeza colapsa antes de que se pierda el espacio; la semiluna es la fractura subcondral."}
+];
+const qz=document.getElementById("quiz"), sc=document.getElementById("score"); let ans=0,ok=0;
+QZ.forEach((x,qi)=>{const d=document.createElement("div");d.className="q";
+  d.innerHTML=`<div class="qt">${qi+1}. ${x.q}</div><div class="opts">${x.o.map((o,i)=>`<button type="button" class="opt" data-i="${i}">${o}</button>`).join("")}</div><p class="exp" hidden></p>`;
+  d.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i; d.querySelectorAll(".opt").forEach(z=>{z.disabled=true;if(+z.dataset.i===x.c)z.classList.add("right");});
+    if(i!==x.c) b.classList.add("wrong"); else ok++;
+    ans++; const ex=d.querySelector(".exp"); ex.hidden=false; ex.textContent=(i===x.c?"Correcto. ":"No es correcto. ")+x.e;
+    sc.textContent=ans<QZ.length?`${ans} de ${QZ.length} respondidas · ${ok} correctas`:`Resultado: ${ok} de ${QZ.length} correctas`;
+  });
+  qz.appendChild(d);});
+sc.textContent=`0 de ${QZ.length} respondidas`;
+
+update();
+})();
+</script>
+
+</body>
+</html>
